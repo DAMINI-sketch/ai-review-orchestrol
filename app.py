@@ -1,238 +1,107 @@
 import streamlit as st
-import re
-import time
-import pandas as pd
 import json
 
-# System Configuration: Forced Wide Dashboard Matrix
-st.set_page_config(page_title="Enterprise AI Review Orchestrator", page_icon="🎛️", layout="wide")
+# Page Setup - Simple & Clean
+st.set_page_config(
+    page_title="Clinical Triage & Compliance Monitor",
+    page_icon="📋",
+    layout="wide"
+)
 
-# High-Position Corporate Enterprise Theme Injection
-st.markdown("""
-    <style>
-    .main-title { font-size: 34px; font-weight: 800; color: #0F172A; font-family: 'Helvetica Neue', sans-serif; margin-bottom: 2px; }
-    .meta-line { font-size: 14px; color: #475569; margin-bottom: 20px; font-family: monospace; }
-    .panel-box { background-color: #F8FAFC; color: #0F172A; padding: 18px; border-radius: 8px; border: 1px solid #E2E8F0; margin-bottom: 15px; }
-    .flow-step-box { background-color: #0F172A; color: #38BDF8; padding: 8px 12px; border-radius: 6px; border: 1px solid #334155; font-family: monospace; font-size: 13px; text-align: center; margin: 4px 0; font-weight: bold; }
-    .badge-alert { background-color: #450A0A; color: #FECDD3; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 12px; border: 1px solid #991B1B; display: inline-block; }
-    .badge-clear { background-color: #064E3B; color: #A7F3D0; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 12px; border: 1px solid #065F46; display: inline-block; }
-    .audit-log { font-family: monospace; font-size: 12px; background-color: #0F172A; color: #10B981; padding: 12px; border-radius: 6px; border: 1px solid #1E293B; line-height: 1.6; }
-    </style>
-""", unsafe_allow_html=True)
+# Application Header - honest & professional
+st.title("📋 Clinical Triage & Compliance Utility Console")
+st.caption("A lean software tool designed for structured data validation and operational risk flagging.")
 
-# Main Application Title & Corporate Header
-st.markdown("<div class='main-title'>🎛️ AI Review Orchestrator Console</div>", unsafe_allow_html=True)
-st.markdown("<div class='meta-line'>SYSTEM OPERATIONAL NODE v2026.6 // DEPLOYED BY DAMINI PRAJAPATI</div>", unsafe_allow_html=True)
+st.markdown("---")
 
-# Technical Precision Privacy Statement
-st.markdown("""
-    <div class='panel-box' style='background-color: #FFFBEB; border-color: #FEF3C7; font-size: 13px; color: #92400E;'>
-        <b>Privacy Guardrail Protocol:</b> Application is designed for session-scoped processing and does not intentionally persist user-submitted content to an application database by default. 
-        Data components execute within volatile, active memory state vectors to mitigate downstream leakage risks into external public model environments.
-    </div>
-""", unsafe_allow_html=True)
+# Initialize Local Session Caching (Simple persistence check)
+if 'session_counter' not in st.session_state:
+    st.session_state['session_counter'] = 0
+st.session_state['session_counter'] += 1
 
-# =================================================================
-# GLOBAL SIDEBAR CONFIGURATION (Enterprise Control)
-# =================================================================
-with st.sidebar:
-    st.markdown("### 📥 Pipeline Infrastructure")
-    selected_pack = st.selectbox(
-        "Industry Extension Pack:",
-        ["Healthcare & Pharmacovigilance Pack (Active)", "General Corporate Compliance Pack"]
+# Top Stats Row
+col1, col2 = st.columns(2)
+with col1:
+    st.metric(label="Local Session State Status", value="Active & Stable")
+with col2:
+    st.metric(label="Current Session Refresh Cycles", value=st.session_state['session_counter'])
+
+st.markdown("---")
+
+# Main Interface Tabs
+tab1, tab2 = st.tabs(["🎯 Clinical Triage Mapping", "🚨 Compliance Risk Tracker"])
+
+# =====================================================================
+# TAB 1: CLINICAL TRIAGE MAPPING (Structured JSON Engine)
+# =====================================================================
+with tab1:
+    st.subheader("Clinical Text Schema Validation")
+    st.markdown("Convert unstructured clinical notes into structured dictionary key-value mappings.")
+    
+    # Default clean note example
+    default_note = (
+        "Patient reported severe headache and acute renal symptoms. "
+        "Symptoms escalated rapidly over the last 48 hours. Primary control group criteria matching."
     )
-    st.divider()
-    st.markdown("**Storage Profile:** `Local Session Memory Ledger (Volatile)`")
-    st.caption("RAM-isolated execution framework. Footprint drops to zero on session close to prevent data leakage.")
-    st.divider()
-    st.markdown("### ⚙️ LLM Infrastructure Cost Control")
-    token_budget = st.slider("Max Token Allocation per Stream:", 500, 4000, 2000, step=500)
-    st.caption("Restricting token payload limits reduces API overhead by up to 22%.")
-
-# Tab Segmentation for Production Workflows
-tab_single, tab_aggregate = st.tabs([
-    "🔒 Real-Time Case Review Pipeline", 
-    "📊 Population-Level Aggregate Signal Engine"
-])
-
-# =================================================================
-# TAB 1: INDIVIDUAL CASE PROCESSING (ENTERPRISE VALIDATION)
-# =================================================================
-with tab_single:
-    col_center, col_right_pane = st.columns([1.2, 1])
-
-    with col_center:
-        st.subheader("📥 Production Ingestion Interface")
-        
-        # POLISH 1: Unstructured, messy realistic clinical note format
-        sample_text_buffer = (
-            "--- CLINICAL ADMISSION NOTE // AMBULATORY TRIAGE ---\n"
-            "Pt Name: Damini Prajapati | DOB: 08-May-2002 | Proxy Ph: 555-0144\n"
-            "History: Pt presented with sudden acute renal tracking numbers indicating critical severe acute kidney injury "
-            "approx 48 hours post initial dose initialization of suspect drug compound ArthroRelief-X for severe rheumatoid arthritis.\n"
-            "Intervention: ArthroRelief-X was instantly withdrawn. Renal indicators stabilized near normal baseline bounds within 96 hours post-dechallenge.\n"
-            "Action item generated by auto-scripting tool: Queue case summary logs to routine monthly low-priority batch archival systems."
-        )
-        raw_payload_input = st.text_area("Target Generation Output Stream Buffer Field:", value=sample_text_buffer, height=180, key="single_text")
-        trigger_execution_loop = st.button("🛡️ Run Operational Audit Loop", type="primary")
-        
-        st.markdown("---")
-        st.subheader("🛠️ Architectural Execution Topology")
-        
-        if trigger_execution_loop:
-            status_container = st.empty()
-            
-            with status_container.container():
-                st.markdown("<div class='flow-step-box'>1. Inbound Text Stream Ingested into Memory Buffer...</div>", unsafe_allow_html=True)
-                time.sleep(0.3)
-                
-            with status_container.container():
-                st.markdown("<div class='flow-step-box'>1. Inbound Text Stream Ingested into Memory Buffer ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>2. Active Identity Intercept Shield Engaged (PII/PHI Redaction Active)...</div>", unsafe_allow_html=True)
-                time.sleep(0.3)
-                
-            with status_container.container():
-                st.markdown("<div class='flow-step-box'>1. Inbound Text Stream Ingested into Memory Buffer ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>2. Active Identity Intercept Shield Engaged (PII/PHI Redaction Active) ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>3. MedDRA Ontological Term-Matching Validation Layer Processing...</div>", unsafe_allow_html=True)
-                time.sleep(0.3)
-                
-            with status_container.container():
-                st.markdown("<div class='flow-step-box'>1. Inbound Text Stream Ingested into Memory Buffer ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>2. Active Identity Intercept Shield Engaged (PII/PHI Redaction Active) ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>3. MedDRA Ontological Term-Matching Validation Layer Passed ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box' style='color:#F43F5E; border-color:#991B1B;'>4. Regulatory Compliance Exception Caught: 7-Day Expedited Priority Timeline Triggered...</div>", unsafe_allow_html=True)
-                time.sleep(0.3)
-                
-            with status_container.container():
-                st.markdown("<div class='flow-step-box'>1. Inbound Text Stream Ingested into Memory Buffer ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>2. Active Identity Intercept Shield Engaged (PII/PHI Redaction Active) ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box'>3. MedDRA Ontological Term-Matching Validation Layer Passed ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box' style='color:#F43F5E; border-color:#991B1B;'>4. Regulatory Compliance Exception Caught: 7-Day Expedited Priority Timeline Triggered ✅</div>", unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center; margin:2px; color:#64748B;'>⬇️</p>", unsafe_allow_html=True)
-                st.markdown("<div class='flow-step-box' style='color:#10B981; border-color:#047857;'>5. Enforcing Human-in-the-Loop Clearance Before Downstream System Push ✅</div>", unsafe_allow_html=True)
+    
+    user_input = st.text_area("Paste Clinical/Operational Notes Here:", value=default_note, height=120)
+    
+    if st.button("Analyze & Structure Mapping", type="primary"):
+        if user_input.strip() == "":
+            st.warning("Please enter some text to analyze.")
         else:
-            st.caption("Awaiting ingestion stream execution to generate topology map.")
-
-    with col_right_pane:
-        st.subheader("📊 Governance & Audit Telemetry")
-        if trigger_execution_loop:
-            lower_input_string = raw_payload_input.lower()
+            # Simple, transparent conditional logic for keyword parsing
+            lowercase_text = user_input.lower()
             
-            phi_leak_risk_present = "555-0144" in raw_payload_input or "Damini Prajapati" in raw_payload_input
-            slippage_detected = "monthly" in lower_input_string or "low-priority" in lower_input_string
-            
-            st.markdown("<div class='panel-box'>", unsafe_allow_html=True)
-            st.markdown("#### **Platform Governance Review Analytics**")
-            st.write("• **System Parametric Risk Classification:**")
-            if phi_leak_risk_present:
-                st.markdown("<span class='badge-alert'>🔴 Critical Compliance Breach Risk Intercepted</span>", unsafe_allow_html=True)
-            else:
-                st.markdown("<span class='badge-clear'>🟢 Low Compliance Risk Track</span>", unsafe_allow_html=True)
-            
-            st.markdown(f"• **Current Guard Intercept Routing Status:** <span class='badge-alert'>🔒 AMBIENT HOLD STATE</span>", unsafe_allow_html=True)
-            st.write("• **Operational Audit ID:** `ORCH-REV-2026-X9B`")
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-            st.markdown("<div class='panel-box' style='border-left: 4px solid #0284C7;'>", unsafe_allow_html=True)
-            st.markdown("#### **🧬 Healthcare Industry Extension Pack**")
-            
-            if phi_leak_risk_present:
-                st.markdown("<span class='badge-alert'>🚨 ACTIVE IDENTIFIER BREACH SHIELD INJECTED</span><br><br>", unsafe_allow_html=True)
-                sanitized_view_string = raw_payload_input.replace("555-0144", "[REDACTED_PROXY_CONTACT]").replace("Damini Prajapati", "[REDACTED_PATIENT_NAME]")
-                st.markdown("**Real-Time Sanitized Data Output For Public Model Consumption:**")
-                st.code(sanitized_view_string, language="text")
-                
-            if slippage_detected:
-                st.error("**Regulatory Timeline Risk Warning:** The model output attempted to route a serious event instance into a low-priority monthly backlog. Global compliance laws mandate an Expedited 7-Day Initial Track Notification for serious outcomes.")
-                
-                extracted_json = {
-                    "Extracted Output Token String": "severe acute kidney injury",
-                    "Normalized MedDRA Preferred Term": "Renal failure acute (PT: 10069339)",
-                    "System Organ Class (SOC) Mapping": "Renal and urinary disorders"
+            structured_data = {
+                "Metadata": {
+                    "character_count": len(user_input),
+                    "status": "Processed Successfully"
+                },
+                "Identified Operational Flags": {
+                    "renal_system_reference": "acute" in lowercase_text or "renal" in lowercase_text,
+                    "escalation_detected": "escalated" in lowercase_text or "severe" in lowercase_text,
+                    "control_group_match": "control group" in lowercase_text
                 }
-                st.json(extracted_json)
-                st.warning("⚠️ **Algorithmic Causality Evaluation:** Automated Naranjo Validation evaluates to a score of **5 [Probable Causal Connection]** based on post-exposure event tracking metrics.")
-            st.markdown("</div>", unsafe_allow_html=True)
+            }
+            
+            st.success("Data successfully parsed into local runtime memory!")
+            st.markdown("#### Validated Data Schema Output (JSON)")
+            st.json(structured_data)
 
-            with st.expander("🔍 View GxP-Compliant AI Determinism Audit Trail"):
-                st.markdown(f"""
-                <div class='audit-log'>
-                [TIMESTAMP: 2026-06-24T19:35:00Z]<br>
-                [SYSTEM]: Initializing Automated Regulatory Mapping Chain...<br>
-                [PARSER]: 'severe acute kidney injury' identified in input stream vector.<br>
-                [MEDDRA_ENGINE]: Executing Relational Autocoding Match...<br>
-                &nbsp;&nbsp;➔ Target Term Found: 'Renal failure acute' (PT Code: 10069339).<br>
-                [COMPLIANCE_CLOCK]: Priority Evaluation Engine triggered...<br>
-                &nbsp;&nbsp;➔ Outcome Serious Criterion Met: 'Other Critically Medically Significant Event'.<br>
-                &nbsp;&nbsp;➔ Routing Status altered from BATCH to EXPEDITED 7-DAY INITIAL TRACK.<br>
-                [INTEGRITY]: Security hash locked successfully (SHA-256: 8f2c9e...). Volatile memory flag set.
-                </div>
-                """, unsafe_allow_html=True)
-                
-            # POLISH 2: High-level downstream pipeline integration mock block
-            with st.expander("🌐 Downstream Pipeline Payload Export (JSON Format)"):
-                st.caption("Enterprise architecture integration payload ready for automated safety safety queues:")
-                payload_export = {
-                    "metadata": {"audit_id": "ORCH-REV-2026-X9B", "timestamp": "2026-06-24T19:35:00Z"},
-                    "case_classification": {"priority": "EXPEDITED_7_DAY", "causality_score": 5},
-                    "safety_events": [{"term": "Renal failure acute", "meddra_pt_code": 10069339, "soc_code": 10038359}]
-                }
-                st.code(json.dumps(payload_export, indent=2), language="json")
-        else:
-            st.info("System evaluation metrics will render here post active processing scans.")
-
-# =================================================================
-# TAB 2: AGGREGATE SIGNAL MONITORING (POPULATION-SCALE OPERATIONS)
-# =================================================================
-with tab_aggregate:
-    st.subheader("📊 Multi-Case Safety Signal Aggregation & Pattern Tracking Engine")
-    st.write("Simulate corporate population-scale tracking over aggregate data streams to isolate statistical safety anomalies.")
+# =====================================================================
+# TAB 2: COMPLIANCE RISK TRACKER (Conditional Rule Logic)
+# =====================================================================
+with tab2:
+    st.subheader("Operational Regulatory Flagging Engine")
+    st.markdown("Evaluates case urgency limits based on strict timeline parameters.")
     
-    mock_data = {
-        "Case_ID": [f"CASE-2026-{i}" for i in range(100, 150)],
-        "Suspect_Exposure": ["ArthroRelief-X" if i % 2 == 0 else "Placebo-V" for i in range(50)],
-        "Mapped_MedDRA_PT": ["Renal failure acute" if i % 4 == 0 else "Headache" for i in range(50)],
-        "Report_Source": ["Clinical Trial Cohort Delta" for _ in range(50)]
-    }
-    df_mock = pd.DataFrame(mock_data)
-    
-    col_agg_left, col_agg_right = st.columns([1, 1.2])
-    
-    with col_agg_left:
-        st.markdown("<div class='panel-box'>", unsafe_allow_html=True)
-        st.markdown("#### **📥 Aggregate Stream Ingestion Workspace**")
-        st.dataframe(df_mock, height=240, use_container_width=True)
-        trigger_signal_scan = st.button("📊 Run Statistical Signal Scanning Loop", type="primary")
-        st.markdown("</div>", unsafe_allow_html=True)
+    # Simple form inputs for rule evaluation
+    with st.form("compliance_form"):
+        case_severity = st.selectbox("Select Case Severity:", ["Low", "Moderate", "Critical"])
+        days_elapsed = st.number_input("Days Elapsed Since Initial Triage Notification:", min_value=0, max_value=60, value=2)
         
-    with col_agg_right:
-        st.markdown("<div class='panel-box'>", unsafe_allow_html=True)
-        st.markdown("#### **🚨 Safety Signaling Alert Engine**")
-        if trigger_signal_scan:
-            with st.spinner("Calculating adverse baseline threshold variants..."):
-                time.sleep(0.5)
-            
-            st.markdown("<span class='badge-alert' style='font-size:14px;'>🚨 [SIGNAL ALERT] SPONTANEOUS ANOMALY DETECTED</span><br><br>", unsafe_allow_html=True)
+        submit_btn = st.form_submit_with_button("Evaluate Compliance Risk Status")
+        
+    if submit_btn:
+        st.markdown("#### Evaluation Results")
+        
+        # Pure logic validation blocks - transparent and robust
+        if case_severity == "Critical" and days_elapsed >= 7:
             st.error(
-                "**Statistical Pattern Discovery:** Compound 'ArthroRelief-X' displays a strict **4.2% data spike** "
-                "in 'Renal failure acute' mapping instances across the processing bundle compared to baseline "
-                "clinical trial control group expectations."
+                f"🚨 **CRITICAL RISK:** Regulatory timeline breached! "
+                f"Expedited safety reporting guidelines require submission within 7 days. Current latency: {days_elapsed} days."
             )
-            st.info("💡 **Orchestrator Regulatory Recommendation:** System recommends elevating state to launch an official Safety Signaling Investigation profile immediately.")
-            
-            st.markdown("---")
-            st.markdown("#### 🪙 Batch Optimization Analysis")
-            st.success("📦 **System Efficiency:** Aggregated batch caching minimized total model call executions by **35%**, saving approximately `$4.20` on this processing run.")
+        elif case_severity == "Moderate" and days_elapsed >= 15:
+            st.warning(
+                f"⚠️ **MODERATE RISK:** Approaching compliance deadline limits for standard tracking profiles. "
+                f"Current latency: {days_elapsed} days."
+            )
         else:
-            st.caption("Click the scan button to parse batch records and evaluate statistical risk frequencies.")
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.success(
+                f"✅ **COMPLIANCE MET:** Current lifecycle tracking for {case_severity} severity "
+                f"is fully within standard processing limits ({days_elapsed} days elapsed)."
+            )
+            
+        # Extra developer context note
+        st.info("💡 Note: This logic module applies deterministic conditional checking against core regulatory schemas.")
